@@ -1,5 +1,23 @@
 // gamepadExtension.mjs
 
+// Xcratch Extension entry metadata
+const EXTENSION_ID = 'gamepad';
+// Will be replaced to the URL used to import this module
+let extensionURL = '';
+
+/**
+ * Entry object for Xcratch Extension Loader
+ */
+const entry = {
+    extensionId: EXTENSION_ID,
+    extensionURL: extensionURL,
+    collaborator: 'your-github-username',  // Change to your GitHub ID or organization
+    // Optional: can set iconURL, description, tags, etc.
+};
+
+/**
+ * GamepadExtension provides blocks for button and axis input
+ */
 class GamepadExtension {
     constructor(runtime) {
         this.runtime = runtime;
@@ -13,17 +31,18 @@ class GamepadExtension {
 
     getInfo() {
         return {
-            id: 'gamepad',
+            id: EXTENSION_ID,
             name: 'Gamepad',
-            color1: '#0f0',
-            color2: '#0a0',
+            extensionURL: extensionURL,
+            blockIconURI: '',  // optional: data URI or URL to icon
+            showStatusButton: false,
             blocks: [
                 {
                     opcode: 'buttonPressed',
                     blockType: Scratch.BlockType.BOOLEAN,
                     text: 'button [BTN] pressed on pad [PAD]',
                     arguments: {
-                        PAD: { type: Scratch.ArgumentType.NUMBER, defaultValue: 1 },
+                        PAD: { type: Scratch.ArgumentType.NUMBER, defaultValue: 1, menu: 'pads' },
                         BTN: { type: Scratch.ArgumentType.STRING, menu: 'buttons', defaultValue: '0' }
                     }
                 },
@@ -32,15 +51,15 @@ class GamepadExtension {
                     blockType: Scratch.BlockType.REPORTER,
                     text: 'axis [AXIS] value on pad [PAD]',
                     arguments: {
-                        PAD: { type: Scratch.ArgumentType.NUMBER, defaultValue: 1 },
+                        PAD: { type: Scratch.ArgumentType.NUMBER, defaultValue: 1, menu: 'pads' },
                         AXIS: { type: Scratch.ArgumentType.STRING, menu: 'axes', defaultValue: '0' }
                     }
                 }
             ],
             menus: {
-                pads:   { items: [1, 2, 3, 4] },
+                pads:    { items: [1, 2, 3, 4] },
                 buttons: { items: Array.from({ length: 16 }, (_, i) => `${i}`) },
-                axes:   { items: ['0', '1', '2', '3'] }
+                axes:    { items: ['0', '1', '2', '3'] }
             }
         };
     }
@@ -60,7 +79,6 @@ class GamepadExtension {
 
     _pollGamepads() {
         this.gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
-        // 次のポーリングをスケジュール
         setTimeout(() => this._pollGamepads(), 100);
     }
 
@@ -75,5 +93,5 @@ class GamepadExtension {
     }
 }
 
-// Xcratch の Extension Loader が default export を import して登録します
-export default GamepadExtension;
+// Export as named exports for Xcratch
+export { GamepadExtension as blockClass, entry };
